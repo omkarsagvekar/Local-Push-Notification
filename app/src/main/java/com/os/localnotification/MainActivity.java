@@ -1,5 +1,6 @@
 package com.os.localnotification;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -7,20 +8,18 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
-import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.core.graphics.drawable.IconCompat;
+
 
 import com.os.localnotification.databinding.ActivityMainBinding;
 
@@ -68,13 +67,31 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_IMMUTABLE);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+        //For Toast action button
+        Intent actionIntent = new Intent(this, Receiver.class);
+        actionIntent.putExtra("toast", "This is a Notification Message");
+        PendingIntent pendingAction = PendingIntent.getBroadcast(this, 0, actionIntent, PendingIntent.FLAG_IMMUTABLE);
+
+        @SuppressLint("RestrictedApi") NotificationCompat.Action action = new NotificationCompat.Action.Builder(IconCompat.createFromIcon(Icon.createWithResource(this,R.drawable.baseline_circle_notifications_24)),
+                "Toast Message", pendingAction).build();
+
+        //For Dismiss action button
+        Intent dissmissIntent = new Intent(this, ReceiverDismiss.class);
+        PendingIntent dismissPending = PendingIntent.getBroadcast(this, 0, dissmissIntent, PendingIntent.FLAG_IMMUTABLE);
+        @SuppressLint("RestrictedApi") NotificationCompat.Action dismissAction = new NotificationCompat.Action.Builder(IconCompat.createFromIcon(Icon.createWithResource(this,
+                R.drawable.baseline_circle_notifications_24)), "Dismiss", dismissPending).build();
+
+
+        @SuppressLint("ResourceAsColor") NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.baseline_circle_notifications_24) // Notification icon
                 .setContentTitle("Local Notification") // Title
                 .setContentText("This is a sample local notification!") // Message
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT) // Priority
                 .setContentIntent(pendingIntent)
-                .setAutoCancel(true); // Auto-dismiss on click
+                .setAutoCancel(true)
+                .addAction(action) // Auto-dismiss on click
+                .addAction(dismissAction);
+
 
         // Show the notification
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
