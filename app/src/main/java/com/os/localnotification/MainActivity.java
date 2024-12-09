@@ -8,6 +8,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
@@ -81,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("RestrictedApi") NotificationCompat.Action dismissAction = new NotificationCompat.Action.Builder(IconCompat.createFromIcon(Icon.createWithResource(this,
                 R.drawable.baseline_circle_notifications_24)), "Dismiss", dismissPending).build();
 
+        //add image
+        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.flower);
+        String longText = getResources().getString(R.string.long_text);
+
 
         @SuppressLint("ResourceAsColor") NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.baseline_circle_notifications_24) // Notification icon
@@ -90,8 +96,11 @@ public class MainActivity extends AppCompatActivity {
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .addAction(action) // Auto-dismiss on click
-                .addAction(dismissAction);
-
+                .addAction(dismissAction)
+                //.setSmallIcon(IconCompat.createWithBitmap(icon))
+                .setLargeIcon(icon)
+                //.setStyle(new NotificationCompat.BigPictureStyle().bigPicture(icon)); //Use for big picture to show in notification
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(longText));  //Use for Large text to show in notification
 
         // Show the notification
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
